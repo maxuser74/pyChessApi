@@ -17,7 +17,6 @@ game_headers = ['Event', 'Site', 'Date', 'Round', 'White',
 df = pd.DataFrame(columns=game_headers)
 
 def parseChessdotcom():
-
     Client.request_config["headers"]["User-Agent"] = (
         "My Python Application. "
         "Contact me at email@example.com"
@@ -81,8 +80,6 @@ def createStatDF():
 
 
     df[['User ELO']] = df[['User ELO']].apply(pd.to_numeric)
-
-    print(tabulate(df.head(), headers='keys'))
 
 def writeXSLX():
     df.to_excel('output.xlsx', index=False)
