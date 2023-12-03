@@ -6,9 +6,10 @@ import csv
 
 period = [2023,4,12]
 player="macspacs"
+openingsurl = "https://www.chess.com/openings/"
 
 info = ["UTCDate", "UTCTime", "Event", "White", "WhiteElo", "Black",
-        "BlackElo", "Result","Termination","ECO", "TimeControl", "CurrentPosition"]
+        "BlackElo", "Result","Termination","ECO", "ECOUrl", "TimeControl", "CurrentPosition"]
 
 def genXSLX():
     eco = {}
@@ -28,6 +29,7 @@ def genXSLX():
     df["User played"] = ""
     df["User ELO"] = ""
     df["User result"] = ""
+    df["Chessdotcom Opening Desc"] = ""
 
     for month in range(period[1],period[2]+1):
         games = get_player_games_by_month(player,period[0],month).json['games']
@@ -69,16 +71,17 @@ def genXSLX():
                 if(row[7]=="1/2-1/2"):
                     row.append("Draw")  # User won
 
+            if(row[10]!=""):
+                row.append("Opening name")
 
             df.loc[len(df)] = row
-
 
     print(df)
     df[['User ELO']] = df[['User ELO']].apply(pd.to_numeric)
     df.to_excel('output.xlsx', index=False)
 
 def main():
-    #genXSLX()
+    genXSLX()
     pass
 
 if __name__ == "__main__":
