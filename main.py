@@ -1,11 +1,12 @@
 import io
-from chessdotcom import get_player_games_by_month, Client
+from chessdotcom import get_player_games_by_month, Client, get_player_stats
 import chess.pgn
 import pandas as pd
 import streamlit as st
 import datetime as dt
 from dateutil.rrule import rrule, MONTHLY
-import csv
+
+player_name = ""
 
 period = [2023, 4, 12]
 player = "macspacs"
@@ -18,8 +19,6 @@ game_headers = ['Event', 'Site', 'Date', 'Round', 'White',
                 'EndDate', 'EndTime', 'Link']
 
 df = pd.DataFrame(columns=game_headers)
-
-eco_dict = {}
 
 
 def parseChessdotcom(start_date, end_date):
@@ -35,6 +34,9 @@ def parseChessdotcom(start_date, end_date):
         "My Python Application. "
         "Contact me at email@example.com"
     )
+
+    response = get_player_stats('macspacs')
+    print(response)
 
     # Month iteration
     for year, month in parse_date_range:
@@ -63,7 +65,6 @@ def createStatDF():
 
     df["Chessdotcom Opening Desc"] = ""
 
-    df["Opening"] = ""
 
     for i in range(len(df)):
         # White
@@ -94,34 +95,21 @@ def createStatDF():
             df.loc[i, "Chessdotcom Opening Desc"] = df.loc[i, "ECOUrl"].replace(openingsurl, "")
             df.loc[i, "Chessdotcom Opening Desc"] = df.loc[i, "Chessdotcom Opening Desc"].replace("-", " ")
 
-        if df.loc[i, "ECO"] != "":
-            df.loc[i, "Opening"] = eco_dict[df.loc[i, "ECO"]]
-
     df[['User ELO']] = df[['User ELO']].apply(pd.to_numeric)
 
 
 def writeXSLX():
     df.to_excel('output.xlsx', index=False)
 
-
-def eco_csv():
-    global eco_dict
-
-    # read csv file
-    with open('ECO.csv', 'r') as file:
-        csv_reader = csv.reader(file, delimiter=";")
-        for row in csv_reader:
-            eco_dict[row[0]] = row[1]
-
-
 def main():
-    eco_csv()
 
     # createStatDF()
     # writeXSLX()
 
     with st.sidebar:
+        global player_name
         st.image('chessdotcomlogo.png', caption='Chess.com')
+        player_name = st.text_input('Player:', 'macspacs')
 
         start_date = st.date_input(
             "From",
