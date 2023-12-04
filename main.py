@@ -5,6 +5,7 @@ import pandas as pd
 import streamlit as st
 import datetime as dt
 from dateutil.rrule import rrule, MONTHLY
+import csv
 
 period = [2023, 4, 12]
 player = "macspacs"
@@ -17,6 +18,9 @@ game_headers = ['Event', 'Site', 'Date', 'Round', 'White',
                 'EndDate', 'EndTime', 'Link']
 
 df = pd.DataFrame(columns=game_headers)
+
+eco_dict = {}
+
 
 def parseChessdotcom(start_date, end_date):
     # Generating a monthly date range
@@ -59,6 +63,8 @@ def createStatDF():
 
     df["Chessdotcom Opening Desc"] = ""
 
+    df["Opening"] = ""
+
     for i in range(len(df)):
         # White
         if df.loc[i, "White"] == player:
@@ -88,12 +94,29 @@ def createStatDF():
             df.loc[i, "Chessdotcom Opening Desc"] = df.loc[i, "ECOUrl"].replace(openingsurl, "")
             df.loc[i, "Chessdotcom Opening Desc"] = df.loc[i, "Chessdotcom Opening Desc"].replace("-", " ")
 
+        if df.loc[i, "ECO"] != "":
+            df.loc[i, "Opening"] = eco_dict[df.loc[i, "ECO"]]
+
     df[['User ELO']] = df[['User ELO']].apply(pd.to_numeric)
+
 
 def writeXSLX():
     df.to_excel('output.xlsx', index=False)
 
+
+def eco_csv():
+    global eco_dict
+
+    # read csv file
+    with open('ECO.csv', 'r') as file:
+        csv_reader = csv.reader(file, delimiter=";")
+        for row in csv_reader:
+            eco_dict[row[0]] = row[1]
+
+
 def main():
+    eco_csv()
+
     # createStatDF()
     # writeXSLX()
 
