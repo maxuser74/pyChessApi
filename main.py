@@ -3,6 +3,7 @@ from chessdotcom import get_player_games_by_month, Client
 import chess.pgn
 import pandas as pd
 from tabulate import tabulate
+import streamlit as st
 
 period = [2023,4,12]
 player="macspacs"
@@ -85,9 +86,22 @@ def writeXSLX():
     df.to_excel('output.xlsx', index=False)
 
 def main():
-    parseChessdotcom()
-    createStatDF()
-    writeXSLX()
+    df = None
+
+    #parseChessdotcom()
+    #createStatDF()
+    #writeXSLX()
+
+    with st.sidebar:
+        st.write("This code will be printed to the sidebar.")
+        uploaded_file = st.file_uploader("Choose a file")
+        if uploaded_file is not None:
+            df = pd.read_excel(uploaded_file, index_col=None)
+
+    if df is not None:
+        st.write("### Chess stats", df.head().sort_index())
+        st.write("### Chess stats", df.tail().sort_index())
+
 
 if __name__ == "__main__":
     main()
