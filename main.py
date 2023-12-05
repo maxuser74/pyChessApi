@@ -65,7 +65,6 @@ def createStatDF():
 
     df["Chessdotcom Opening Desc"] = ""
 
-
     for i in range(len(df)):
         # White
         if df.loc[i, "White"] == player:
@@ -100,6 +99,7 @@ def createStatDF():
 
 def writeXSLX():
     df.to_excel('output.xlsx', index=False)
+
 
 def main():
     global df
@@ -141,11 +141,13 @@ def main():
             df = pd.read_excel(uploaded_file, index_col=None)
             createStatDF()
 
-    with st.expander(str(player_name) + " games " + str(start_date)
+    with st.expander(str(player_name) + " games     >>     "
+                     + str(start_date)
                      + " - " + str(end_date)):
-            if not df.empty:
-                st.dataframe(df.head())
-                st.dataframe(df.tail())
+        if not df.empty:
+            st.dataframe(df.head())
+            st.dataframe(df.tail())
+
 
 if __name__ == "__main__":
     main()
