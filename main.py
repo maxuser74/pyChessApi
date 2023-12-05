@@ -102,12 +102,12 @@ def writeXSLX():
     df.to_excel('output.xlsx', index=False)
 
 def main():
-
+    global df
     # createStatDF()
     # writeXSLX()
 
     with st.sidebar:
-        global player_name
+        global player_name, df
         st.image('chessdotcomlogo.png', caption='Chess.com')
         player_name = st.text_input('Player:', 'macspacs')
 
@@ -128,16 +128,24 @@ def main():
         if st.button("Parse Chess.com"):
             parseChessdotcom(start_date, end_date)
             createStatDF()
+            print("Parse")
+
+        if st.button("Clear"):
+            print("Clear")
+            if not df.empty:
+                print("Dataframe not empty")
+                df = df.iloc[0:0]
 
         uploaded_file = st.file_uploader("Choose a file")
         if uploaded_file is not None:
-            global df
             df = pd.read_excel(uploaded_file, index_col=None)
             createStatDF()
 
-    st.write("### Chess stats")
-    st.dataframe(df)
-
+    with st.expander(str(player_name) + " games " + str(start_date)
+                     + " - " + str(end_date)):
+            if not df.empty:
+                st.dataframe(df.head())
+                st.dataframe(df.tail())
 
 if __name__ == "__main__":
     main()
